@@ -18,7 +18,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Calculadora de lixo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 31, 85, 71)),
@@ -40,18 +40,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final calcController = TextEditingController();
+  final familyController = TextEditingController();
 
   @override
   void dispose() {
     calcController.dispose();
     super.dispose();
-  }
-
-  int calcVolumeLixo(int vlr) {
-    setState(() {
-      vlr * 32;
-    });
-    return vlr;
   }
 
   @override
@@ -71,8 +65,20 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 TextField(
                   controller: calcController,
-                  decoration:
-                      const InputDecoration(labelText: "Enter your number"),
+                  decoration: const InputDecoration(
+                      labelText: "Numero de sacolas utilizados:"),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                  controller: familyController,
+                  decoration: const InputDecoration(
+                      labelText: "Quantas pessoas vivem com você?"),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -87,10 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            content: Text(
-                                calcVolumeLixo(int.parse(calcController.text))
-                                    .toString()),
-                          );
+                              content: Text((int.parse(calcController.text) *
+                                      int.parse(familyController.text))
+                                  .toString()));
                         });
                   },
                   tooltip: 'Show me the value',
