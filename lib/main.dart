@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 TextField(
                   controller: calcController,
                   decoration: const InputDecoration(
-                      labelText: "Numero de sacolas utilizados:"),
+                      labelText: "Numero de sacolas utilizados \n na semana:"),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -110,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.group_solid), label: 'Socials'),
             BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.delete), label: 'Apagar')
+                icon: Icon(CupertinoIcons.checkmark_shield_fill),
+                label: 'Dicas')
           ])
         ],
       ),
