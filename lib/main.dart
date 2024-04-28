@@ -1,6 +1,8 @@
+import 'package:calculadora_de_lixo/pages/socialPage.dart';
+import 'package:calculadora_de_lixo/pages/tips.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'pages/homePage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,106 +17,64 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Calculadora de lixo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 31, 85, 71)),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Calculadora de lixo'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final calcController = TextEditingController();
-  final familyController = TextEditingController();
+  final _pageController = PageController();
+  int _currentIndex = 0;
 
   @override
   void dispose() {
-    calcController.dispose();
     super.dispose();
+    _pageController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(75.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: calcController,
-                  decoration: const InputDecoration(
-                      labelText: "Numero de sacolas utilizados \n na semana:"),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: familyController,
-                  decoration: const InputDecoration(
-                      labelText: "Quantas pessoas vivem com você?"),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                FloatingActionButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                              content: Text((int.parse(calcController.text) *
-                                      int.parse(familyController.text))
-                                  .toString()));
-                        });
-                  },
-                  tooltip: 'Show me the value',
-                  child: const Icon(Icons.calculate),
-                )
-              ],
-            ),
+    return MaterialApp(
+        title: 'Calculadora de lixo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 31, 85, 71)),
+          useMaterial3: true,
+        ),
+        home: Scaffold(
+          appBar: AppBar(
+            backgroundColor:
+                ColorSchemeCommom().themeData.colorScheme.inversePrimary,
+            title: const Text("Calculadora de lixo"),
+            centerTitle: true,
           ),
-          BottomNavigationBar(items: const [
-            BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.home), label: 'Home'),
-            BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.group_solid), label: 'Socials'),
-            BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.checkmark_shield_fill),
-                label: 'Dicas')
-          ])
-        ],
-      ),
-    );
+          body: PageView(
+            controller: _pageController,
+            children: const <Widget>[
+              MyHomePage(title: "Calculadora de lixo"),
+              SocialPage(),
+              TipsPage()
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                _pageController.animateToPage(index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut);
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.home), label: 'Home'),
+                BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.group_solid), label: 'Socials'),
+                BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.checkmark_shield_fill),
+                    label: 'Dicas')
+              ]),
+        ));
   }
+}
+
+class ColorSchemeCommom {
+  ThemeData themeData = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 31, 85, 71)));
 }
