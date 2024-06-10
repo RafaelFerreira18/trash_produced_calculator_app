@@ -1,6 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+
+const List<String> trashTypeList = <String>[
+  'Sacola de supermercado',
+  'Saco de lixo'
+];
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -46,6 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(
                   height: 20,
                 ),
+                const DropdownButtonTypesOfTrash(),
+                const SizedBox(
+                  height: 20,
+                ),
                 TextField(
                   controller: familyController,
                   decoration: const InputDecoration(
@@ -77,6 +87,44 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DropdownButtonTypesOfTrash extends StatefulWidget {
+  const DropdownButtonTypesOfTrash({super.key});
+
+  @override
+  State<DropdownButtonTypesOfTrash> createState() =>
+      _DropdownButtonTypesOfTrashState();
+}
+
+class _DropdownButtonTypesOfTrashState
+    extends State<DropdownButtonTypesOfTrash> {
+  String dropdownValue = trashTypeList.first;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(CupertinoIcons.arrow_down),
+      elevation: 16,
+      style: const TextStyle(color: Colors.black54),
+      underline: Container(
+        height: 2,
+        color: Colors.black,
+      ),
+      onChanged: (String? value) {
+        setState(() {
+          dropdownValue = value!;
+        });
+      },
+      items: trashTypeList.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }
