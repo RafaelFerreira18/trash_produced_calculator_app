@@ -38,10 +38,10 @@ class _TipsPageState extends State<TipsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Feed de Exemplo'),
+        title: const Text('Feed de Exemplo'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               _addNewPost(context);
             },
@@ -65,18 +65,18 @@ class _TipsPageState extends State<TipsPage> {
     final title = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Novo Post'),
-        content: TextField(
+        title: const Text('Novo Post'),
+        content: const TextField(
           autofocus: true,
           decoration: InputDecoration(labelText: 'Título'),
         ),
         actions: [
           TextButton(
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: Text('Criar'),
+            child: const Text('Criar'),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -87,18 +87,18 @@ class _TipsPageState extends State<TipsPage> {
     final description = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Descrição'),
-        content: TextField(
+        title: const Text('Descrição'),
+        content: const TextField(
           autofocus: true,
           decoration: InputDecoration(labelText: 'Descrição'),
         ),
         actions: [
           TextButton(
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: Text('Criar'),
+            child: const Text('Criar'),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
