@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:calculadora_de_lixo/notifications_config.dart';
 
 class TrashEntry {
   String trashType;
@@ -25,7 +29,7 @@ int checkTypeOfTrash(String dropdownValue) {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -37,8 +41,26 @@ class _MyHomePageState extends State<MyHomePage> {
   final calcController = TextEditingController(text: '0');
   final familyController = TextEditingController(text: '0');
   String dropdownValue = trashTypeList.first;
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  final user = FirebaseAuth.instance.currentUser!;
+  final NotificationUtils _notificationUtils = NotificationUtils();
 
   List<TrashEntry> trashEntries = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeNotifications();
+  }
+
+  Future<void> initializeNotifications() async {
+    await _notificationUtils.initializeNotifications(context);
+    await _notificationUtils.startListeningNotificationEvents();
+  }
+
+  void scheduleNotification() {
+    _notificationUtils.scheduleNotification();
+  }
 
   @override
   void dispose() {
@@ -55,14 +77,72 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> addTrashData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String documentId = querySnapshot.docs.first.id;
+        DocumentReference userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(documentId);
+
+        DocumentSnapshot<Object?> docSnapshot = await userDocRef.get();
+        DocumentSnapshot<Map<String, dynamic>> userData =
+            docSnapshot as DocumentSnapshot<Map<String, dynamic>>;
+
+        Map<String, dynamic> newTrashData = {
+          currentDate: double.parse(calculateTrash()),
+        };
+
+        if (userData.exists &&
+            userData.data() != null &&
+            userData.data()!.containsKey('trashData')) {
+          newTrashData.addAll(userData.data()!['trashData']);
+        }
+
+        await userDocRef.set(
+          {
+            'trashData': newTrashData,
+          },
+          SetOptions(merge: true),
+        );
+
+        print(
+            'Dados de lixo adicionados/atualizados com sucesso para $currentDate');
+      } else {
+        print('Usuário com email ${user.email} não encontrado');
+      }
+    } catch (e) {
+      print('Erro ao adicionar/atualizar dados de lixo: $e');
+    }
+  }
+
   String calculateTrash() {
-    int counter = 0;
+    double counter = 0;
     for (int i = 0; i < trashEntries.length; i++) {
       counter += trashEntries[i].trashCount *
           checkTypeOfTrash(trashEntries[i].trashType);
     }
-    counter = counter * int.parse(familyController.text);
+    counter = counter / int.parse(familyController.text);
     return counter.toString();
+  }
+
+  Text checkAverage() {
+    if (double.parse(calculateTrash()) < 7) {
+      return Text(
+          'Você está abaixo da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa, parabéns!');
+    } else if (double.parse(calculateTrash()) == 7) {
+      return Text(
+          'Você está na da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa');
+    } else if (double.parse(calculateTrash()) > 7) {
+      return Text(
+          'Você está acima da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa');
+    } else {
+      return const Text("Algum erro foi encontrado");
+    }
   }
 
   @override
@@ -76,11 +156,9 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                "Cálculo é feito por semana",
-                style: TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 20),
+              const Text("Cálculo é feito por semana",
+                  style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+              const SizedBox(height: 40),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -148,22 +226,43 @@ class _MyHomePageState extends State<MyHomePage> {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return AlertDialog(
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: trashEntries.length,
-                                itemBuilder: (context, index) {
-                                  final entry = trashEntries[index];
-                                  return ListTile(
-                                    title: Text(
-                                      '${entry.trashType}: ${entry.trashCount}',
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return AlertDialog(
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Expanded(
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: trashEntries.length,
+                                          itemBuilder: (context, index) {
+                                            final entry = trashEntries[index];
+                                            return ListTile(
+                                              title: Text(
+                                                '${entry.trashType}: ${entry.trashCount}',
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () {
+                                          if (trashEntries.isNotEmpty) {
+                                            setState(() {
+                                              trashEntries.removeLast();
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
                       );
@@ -177,12 +276,27 @@ class _MyHomePageState extends State<MyHomePage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            content: Text(
-                              'Você produziu aproximadamente ${calculateTrash()}L de lixo',
+                            content: Column(
+                              children: [
+                                Text(
+                                  'Você produziu aproximadamente ${calculateTrash()}kg de lixo',
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Text(
+                                    'A média de lixo produzida por brasileiro é de 7kg por semana'),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                checkAverage(),
+                              ],
                             ),
                           );
                         },
                       );
+                      addTrashData();
+                      scheduleNotification();
                     },
                     tooltip: 'Mostrar o valor',
                     child: const Icon(Icons.calculate),

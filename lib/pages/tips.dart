@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
 
 class TipsPage extends StatefulWidget {
-  const TipsPage({super.key});
+  const TipsPage({Key? key}) : super(key: key);
 
   @override
   _TipsPageState createState() => _TipsPageState();
 }
 
 class _TipsPageState extends State<TipsPage> {
-  List<Post> posts = [
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-    Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-  ];
+  List<Post> posts = [];
 
-  void addPost(String title, String description) {
-    setState(() {
-      posts.add(Post(title: title, description: description));
-    });
+  @override
+  void initState() {
+    super.initState();
+    // Exemplo de posts iniciais aqui. Adicionar dicas.
+    posts = [
+      Post(title: 'Título do Post X', description: 'Descrição do Post X'),
+      Post(title: 'Título do Post X', description: 'Descrição do Post X'),
+    ];
+  }
+
+  void addPost(String? title, String? description) {
+    if (title != null && description != null) {
+      setState(() {
+        posts.add(Post(title: title, description: description));
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Feed de Exemplo'),
+        title: const Text('Dicas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -62,13 +56,19 @@ class _TipsPageState extends State<TipsPage> {
   }
 
   void _addNewPost(BuildContext context) async {
-    final title = await showDialog<String>(
+    String? title;
+    String? description;
+
+    title = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Novo Post'),
-        content: const TextField(
+        content: TextField(
           autofocus: true,
-          decoration: InputDecoration(labelText: 'Título'),
+          decoration: const InputDecoration(labelText: 'Título'),
+          onChanged: (value) {
+            title = value;
+          },
         ),
         actions: [
           TextButton(
@@ -77,20 +77,27 @@ class _TipsPageState extends State<TipsPage> {
           ),
           TextButton(
             child: const Text('Criar'),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (title != null && title!.isNotEmpty) {
+                Navigator.of(context).pop(title);
+              }
+            },
           ),
         ],
       ),
     );
     if (title == null) return;
 
-    final description = await showDialog<String>(
+    description = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Descrição'),
-        content: const TextField(
+        content: TextField(
           autofocus: true,
-          decoration: InputDecoration(labelText: 'Descrição'),
+          decoration: const InputDecoration(labelText: 'Descrição'),
+          onChanged: (value) {
+            description = value;
+          },
         ),
         actions: [
           TextButton(
@@ -99,7 +106,11 @@ class _TipsPageState extends State<TipsPage> {
           ),
           TextButton(
             child: const Text('Criar'),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (description != null && description!.isNotEmpty) {
+                Navigator.of(context).pop(description);
+              }
+            },
           ),
         ],
       ),
