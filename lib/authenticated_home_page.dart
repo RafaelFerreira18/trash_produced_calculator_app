@@ -11,9 +11,9 @@ import 'pages/tips.dart';
 
 class UserData {
   String email;
-  String firstName;
+  String name;
 
-  UserData({required this.email, required this.firstName});
+  UserData({required this.email, required this.name});
 }
 
 Future<UserData> getData() async {
@@ -29,7 +29,7 @@ Future<UserData> getData() async {
         var ds = querySnapshot.docs.first;
         userData = UserData(
           email: ds['email'],
-          firstName: ds['firstName'],
+          name: ds['name'],
         );
         return userData;
       } else {
@@ -123,7 +123,8 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
                       PopupMenuItem(
-                          child: Text("Bem vindo! ${_userData?.firstName}")),
+                          child: Text(
+                              "Bem vindo! ${_userData?.name.split(" ")[0]}")),
                       const PopupMenuItem<int>(
                         value: 0,
                         child: Text('Histórico'),

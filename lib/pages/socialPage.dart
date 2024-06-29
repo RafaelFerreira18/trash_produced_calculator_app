@@ -81,7 +81,7 @@ class _SocialPageState extends State<SocialPage> {
                 final userId = user['id'];
 
                 return ListTile(
-                  title: Text(user['name'] ?? 'Desconhecido'),
+                  title: Text(user['name'] ?? ''),
                   subtitle: Text(user['email']),
                   trailing: FutureBuilder<bool>(
                     future: _isFollowing(userId),

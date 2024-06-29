@@ -15,14 +15,23 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _register() async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
       );
-      addUserDetails(_nameController.text.trim(), _emailController.text.trim());
+
+      await _firestore.collection("users").doc(userCredential.user?.uid).set({
+        'email': _emailController.text,
+        'name': _nameController.text,
+        'trashData': {}
+      });
+
+      print(userCredential.user?.uid);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const AuthenticatedHomePage()),
@@ -31,14 +40,6 @@ class _RegisterPageState extends State<RegisterPage> {
       print('Registration failed: $e');
       // Mostrar mensagem de erro ao usuário
     }
-  }
-
-  Future addUserDetails(String name, String email) async {
-    await FirebaseFirestore.instance.collection('users').add({
-      'firstName': name,
-      'email': email,
-      'trashData': {},
-    });
   }
 
   @override
@@ -59,18 +60,18 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Senha'),
               obscureText: true,
             ),
             ElevatedButton(
               onPressed: _register,
-              child: const Text('Register'),
+              child: const Text('Cadastrar'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Already have an account? Login'),
+              child: const Text('Já possui uma conta? Faça Login'),
             ),
           ],
         ),
