@@ -11,10 +11,9 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -26,10 +25,11 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text,
       );
 
-      await _firestore
-          .collection("users")
-          .doc(userCredential.user?.uid)
-          .set({'email': _emailController.text, 'name': _nameController.text});
+      await _firestore.collection("users").doc(userCredential.user?.uid).set({
+        'email': _emailController.text,
+        'name': _nameController.text,
+        'trashData': {}
+      });
 
       print(userCredential.user?.uid);
       Navigator.pushReplacement(
@@ -42,7 +42,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void _saveUser() async {}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nome'),
+              decoration: const InputDecoration(labelText: 'Primeiro nome'),
             ),
             TextField(
               controller: _emailController,

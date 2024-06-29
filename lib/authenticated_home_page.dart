@@ -1,10 +1,46 @@
+import 'package:calculadora_de_lixo/pages/chartPage.dart';
 import 'package:calculadora_de_lixo/pages/loginPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/homePage.dart';
 import 'pages/socialPage.dart';
 import 'pages/tips.dart';
+
+class UserData {
+  String email;
+  String name;
+
+  UserData({required this.email, required this.name});
+}
+
+Future<UserData> getData() async {
+  UserData userData;
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        var ds = querySnapshot.docs.first;
+        userData = UserData(
+          email: ds['email'],
+          name: ds['name'],
+        );
+        return userData;
+      } else {
+        throw Exception("No user found with this email");
+      }
+    } else {
+      throw Exception("No user is currently signed in");
+    }
+  } catch (e) {
+    throw Exception("Failed to fetch user data: $e");
+  }
+}
 
 class AuthenticatedHomePage extends StatefulWidget {
   const AuthenticatedHomePage({super.key});
@@ -17,6 +53,24 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
   final _pageController = PageController();
   int _currentIndex = 0;
   final user = FirebaseAuth.instance.currentUser!;
+  UserData? _userData;
+
+  Future<void> _loadUserData() async {
+    try {
+      UserData userData = await getData();
+      setState(() {
+        _userData = userData;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
 
   Future<void> _logout() async {
     FirebaseAuth.instance.signOut();
@@ -52,13 +106,18 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
                 ),
                 onSelected: (int result) {
                   if (result == 0) {
-                    // Implementar outras ações aqui se necessário
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LineChartPage()),
+                    );
                   } else if (result == 1) {
                     _logout();
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                      PopupMenuItem(child: Text("Bem vindo! ${user.email!}")),
+                      PopupMenuItem(
+                          child: Text(
+                              "Bem vindo! ${_userData?.name.split(" ")[0]}")),
                       const PopupMenuItem<int>(
                         value: 0,
                         child: Text('Outra Ação'),
