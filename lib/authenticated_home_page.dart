@@ -1,4 +1,5 @@
 import 'package:calculadora_de_lixo/pages/chartPage.dart';
+import 'package:calculadora_de_lixo/pages/leaderBoardPage.dart';
 import 'package:calculadora_de_lixo/pages/loginPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -111,6 +112,12 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
                       MaterialPageRoute(builder: (context) => LineChartPage()),
                     );
                   } else if (result == 1) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LeaderboardPage()),
+                    );
+                  } else if (result == 2) {
                     _logout();
                   }
                 },
@@ -119,10 +126,14 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
                           child: Text("Bem vindo! ${_userData?.firstName}")),
                       const PopupMenuItem<int>(
                         value: 0,
-                        child: Text('Outra Ação'),
+                        child: Text('Histórico'),
                       ),
                       const PopupMenuItem<int>(
                         value: 1,
+                        child: Text('Leaderboard'),
+                      ),
+                      const PopupMenuItem<int>(
+                        value: 2,
                         child: Text('Logout'),
                       ),
                     ]),
