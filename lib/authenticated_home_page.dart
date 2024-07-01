@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'pages/homePage.dart';
 import 'pages/socialPage.dart';
 import 'pages/tips.dart';
+import 'pages/feed.dart';
 
 class UserData {
   String email;
@@ -146,7 +147,7 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
         children: const <Widget>[
           MyHomePage(title: "Calculadora de lixo"),
           SocialPage(),
-          TipsPage()
+          FeedPage()
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
