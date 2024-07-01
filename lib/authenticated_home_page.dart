@@ -1,4 +1,5 @@
 import 'package:calculadora_de_lixo/pages/chartPage.dart';
+import 'package:calculadora_de_lixo/pages/feed.dart';
 import 'package:calculadora_de_lixo/pages/loginPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -135,7 +136,7 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
         children: const <Widget>[
           MyHomePage(title: "Calculadora de lixo"),
           SocialPage(),
-          TipsPage()
+          FeedPage()
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
