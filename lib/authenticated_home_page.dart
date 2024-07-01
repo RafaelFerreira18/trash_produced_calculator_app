@@ -135,7 +135,7 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
                       ),
                       const PopupMenuItem<int>(
                         value: 2,
-                        child: Text('Logout'),
+                        child: Text('Sair'),
                       ),
                     ]),
           )

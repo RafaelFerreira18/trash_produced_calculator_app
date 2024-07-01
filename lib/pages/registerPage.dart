@@ -45,14 +45,14 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: const Text('Registrar')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Primeiro nome'),
+              decoration: const InputDecoration(labelText: 'Nome completo'),
             ),
             TextField(
               controller: _emailController,

@@ -92,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
             ),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Senha'),
               obscureText: true,
             ),
             const SizedBox(height: 20),
@@ -107,7 +107,7 @@ class LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(builder: (context) => const RegisterPage()),
                 );
               },
-              child: const Text('Don\'t have an account? Register'),
+              child: const Text('Ainda não tem uma conta? Registre-se!'),
             ),
           ],
         ),
