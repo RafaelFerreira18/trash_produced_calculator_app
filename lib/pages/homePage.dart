@@ -89,18 +89,17 @@ class _MyHomePageState extends State<MyHomePage> {
         DocumentReference userDocRef =
             FirebaseFirestore.instance.collection('users').doc(documentId);
 
-        DocumentSnapshot<Object?> docSnapshot = await userDocRef.get();
-        DocumentSnapshot<Map<String, dynamic>> userData =
-            docSnapshot as DocumentSnapshot<Map<String, dynamic>>;
+        DocumentSnapshot<Map<String, dynamic>> docSnapshot =
+            await userDocRef.get() as DocumentSnapshot<Map<String, dynamic>>;
 
         Map<String, dynamic> newTrashData = {
           currentDate: double.parse(calculateTrash()),
         };
 
-        if (userData.exists &&
-            userData.data() != null &&
-            userData.data()!.containsKey('trashData')) {
-          newTrashData.addAll(userData.data()!['trashData']);
+        if (docSnapshot.exists &&
+            docSnapshot.data() != null &&
+            docSnapshot.data()!.containsKey('trashData')) {
+          newTrashData.addAll(docSnapshot.data()!['trashData']);
         }
 
         await userDocRef.set(
@@ -112,12 +111,57 @@ class _MyHomePageState extends State<MyHomePage> {
 
         print(
             'Dados de lixo adicionados/atualizados com sucesso para $currentDate');
+
+        // Calcula a pontuação e atualiza se for o caso
+        double totalTrashGenerated =
+            newTrashData.values.reduce((a, b) => a + b);
+        await updateUserPoints(documentId, totalTrashGenerated);
       } else {
         print('Usuário com email ${user.email} não encontrado');
       }
     } catch (e) {
       print('Erro ao adicionar/atualizar dados de lixo: $e');
     }
+  }
+
+  Future<void> updateUserPoints(
+      String userId, double totalTrashGenerated) async {
+    const double averageTrash = 7.0;
+    double points = averageTrash - totalTrashGenerated;
+
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection('users').doc(userId);
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(userRef);
+
+      if (!snapshot.exists) {
+        throw Exception("User does not exist!");
+      }
+
+      Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>?;
+
+      double currentPoints = userData?['points'] ?? 0.0;
+      Timestamp? lastPointUpdateTimestamp = userData?['lastPointUpdate'];
+      DateTime now = DateTime.now();
+
+      // Verifica se o usuário já recebeu pontos na última semana
+      if (lastPointUpdateTimestamp != null) {
+        DateTime lastPointUpdate = lastPointUpdateTimestamp.toDate();
+        if (now.difference(lastPointUpdate).inDays < 7) {
+          print("User has already received points this week.");
+          return;
+        }
+      }
+
+      // Inicializa os campos se não existirem e atualiza pontos e lastPointUpdate
+      transaction.set(
+          userRef,
+          {
+            'points': currentPoints + points,
+            'lastPointUpdate': now,
+          },
+          SetOptions(merge: true));
+    });
   }
 
   String calculateTrash() {
