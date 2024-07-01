@@ -13,19 +13,33 @@ class _TipsPageState extends State<TipsPage> {
   @override
   void initState() {
     super.initState();
-    // Exemplo de posts iniciais aqui. Adicionar dicas.
+    // Posts pré-definidos
     posts = [
-      Post(title: 'Título do Post X', description: 'Descrição do Post X'),
-      Post(title: 'Título do Post X', description: 'Descrição do Post X'),
+      Post(
+        title: 'Evite o Desperdício: Dicas Simples para Reduzir o Lixo Alimentar',
+        description:
+            'Aprenda estratégias para aproveitar ao máximo os alimentos e evitar desperdícios desnecessários na sua cozinha. Planejar refeições, armazenar alimentos corretamente e utilizar sobras para criar novos pratos são algumas das maneiras de reduzir o lixo alimentar. Além de economizar dinheiro, você contribui para a redução da emissão de gases de efeito estufa gerados pelo desperdício de alimentos.',
+        imagePath: 'assets/tipsImages/desperdicio-de-alimentos.jpg',
+      ),
+      Post(
+        title: 'Guia de Separação de Resíduos: Como Fazer a Reciclagem Corretamente',
+        description:
+            'Saiba como separar seu lixo de maneira eficiente para facilitar o processo de reciclagem e contribuir para o meio ambiente. É essencial separar plásticos, papéis, metais e vidros em recipientes distintos, removendo contaminantes como restos de alimentos. Conhecer as diretrizes locais de reciclagem ajuda a garantir que seus esforços tenham o máximo impacto positivo.',
+        imagePath: 'assets/tipsImages/separacao-de-residuos.jpg',
+      ),
+      Post(
+        title: 'Transforme seu Lixo em Recursos: Dicas de Reciclagem Criativa!',
+        description:
+            'Aprenda maneiras inovadoras de reciclar materiais comuns e dar uma segunda vida a itens que iriam para o lixo. Você pode transformar garrafas plásticas em vasos para plantas, potes de vidro em organizadores e até mesmo criar obras de arte a partir de materiais reciclados. Essa abordagem não só reduz o desperdício como também estimula a criatividade e promove um estilo de vida mais sustentável.',
+        imagePath: 'assets/tipsImages/reciclagem-criativa.jpg',
+      ),
+      Post(
+        title: 'Reduzir, Reutilizar, Reciclar: Como Cuidar Melhor do Nosso Lixo',
+        description:
+            'Descubra práticas simples para reduzir sua pegada de lixo e fazer escolhas mais sustentáveis no dia a dia. A chave para reduzir o lixo está em optar por produtos com menos embalagens, preferir itens duráveis e reutilizáveis, e reciclar corretamente tudo o que puder. Ao praticar o "reduzir, reutilizar, reciclar", você contribui significativamente para a preservação do meio ambiente.',
+        imagePath: 'assets/tipsImages/reduzir-reutilizar-reciclar.jpg',
+      ),
     ];
-  }
-
-  void addPost(String? title, String? description) {
-    if (title != null && description != null) {
-      setState(() {
-        posts.add(Post(title: title, description: description));
-      });
-    }
   }
 
   @override
@@ -33,97 +47,55 @@ class _TipsPageState extends State<TipsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dicas'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              _addNewPost(context);
-            },
-          ),
-        ],
       ),
       body: ListView.builder(
         itemCount: posts.length,
-        itemBuilder: (context, index) {
-          final post = posts[index];
-          return ListTile(
-            title: Text(post.title),
-            subtitle: Text(post.description),
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        posts[index].title,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        posts[index].description,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                Image.asset(
+                  posts[index].imagePath,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
           );
         },
       ),
     );
-  }
-
-  void _addNewPost(BuildContext context) async {
-    String? title;
-    String? description;
-
-    title = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Novo Post'),
-        content: TextField(
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Título'),
-          onChanged: (value) {
-            title = value;
-          },
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancelar'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Criar'),
-            onPressed: () {
-              if (title != null && title!.isNotEmpty) {
-                Navigator.of(context).pop(title);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-    if (title == null) return;
-
-    description = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Descrição'),
-        content: TextField(
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Descrição'),
-          onChanged: (value) {
-            description = value;
-          },
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancelar'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Criar'),
-            onPressed: () {
-              if (description != null && description!.isNotEmpty) {
-                Navigator.of(context).pop(description);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-    if (description == null) return;
-
-    addPost(title, description);
   }
 }
 
 class Post {
   String title;
   String description;
+  String imagePath;
 
-  Post({required this.title, required this.description});
+  Post({required this.title, required this.description, required this.imagePath});
 }

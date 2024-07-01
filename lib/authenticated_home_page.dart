@@ -147,7 +147,8 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
         children: const <Widget>[
           MyHomePage(title: "Calculadora de lixo"),
           SocialPage(),
-          FeedPage()
+          FeedPage(),
+          //TipsPage()
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -166,7 +167,7 @@ class _AuthenticatedHomePageState extends State<AuthenticatedHomePage> {
           BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.group_solid), label: 'Socials'),
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.checkmark_shield_fill), label: 'Dicas')
+              icon: Icon(CupertinoIcons.checkmark_shield_fill), label: 'Feed')
         ],
       ),
     );
