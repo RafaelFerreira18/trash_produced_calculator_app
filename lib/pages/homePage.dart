@@ -1,3 +1,4 @@
+import 'package:calculadora_de_lixo/pages/tips.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,15 +15,18 @@ class TrashEntry {
 }
 
 const List<String> trashTypeList = <String>[
-  'Sacola de supermercado 10L',
+  'Sacola 5L',
+  'Sacola 10L',
   'Saco de lixo 50L'
 ];
 
 int checkTypeOfTrash(String dropdownValue) {
-  if (dropdownValue == "Sacola de supermercado 10L") {
+  if (dropdownValue == "Sacola 10L") {
     return 10;
   } else if (dropdownValue == "Saco de lixo 50L") {
     return 50;
+  } else if (dropdownValue == 'Sacola 5L') {
+    return 5;
   } else {
     return 0;
   }
@@ -127,7 +131,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> updateUserPoints(
       String userId, double totalTrashGenerated) async {
     const double averageTrash = 7.0;
-    double points = averageTrash - totalTrashGenerated;
+    double points = 0;
+
+    if (averageTrash - totalTrashGenerated <= 0) {
+      points = 0;
+    } else {
+      points = averageTrash - totalTrashGenerated;
+    }
 
     DocumentReference userRef =
         FirebaseFirestore.instance.collection('users').doc(userId);
@@ -174,16 +184,43 @@ class _MyHomePageState extends State<MyHomePage> {
     return counter.toString();
   }
 
-  Text checkAverage() {
+  Widget checkAverage() {
     if (double.parse(calculateTrash()) < 7) {
-      return Text(
-          'Você está abaixo da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa, parabéns!');
+      return const Text(
+        'Você está abaixo da média, parabéns!',
+        style: TextStyle(fontSize: 20),
+      );
     } else if (double.parse(calculateTrash()) == 7) {
-      return Text(
-          'Você está na da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa');
+      return const Text(
+        "Você está na média",
+        style: TextStyle(fontSize: 20),
+      );
     } else if (double.parse(calculateTrash()) > 7) {
-      return Text(
-          'Você está acima da média, produziu ${(double.parse(calculateTrash())).toString()}kg por pessoa');
+      return Column(
+        children: [
+          const Text(
+            'Você está acima da média, tome cuidado!',
+            style: TextStyle(fontSize: 15),
+          ),
+          const SizedBox(height: 15),
+          const Text(
+            'Siga as dicas a seguir para conseguir diminuir a quantidade de lixo produzida',
+            style: TextStyle(fontSize: 15),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const TipsPage()),
+              );
+            },
+            child: const Text('Dicas'),
+          )
+        ],
+      );
     } else {
       return const Text("Algum erro foi encontrado");
     }
@@ -321,15 +358,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) {
                           return AlertDialog(
                             content: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   'Você produziu aproximadamente ${calculateTrash()}kg de lixo',
+                                  style: const TextStyle(fontSize: 15),
                                 ),
                                 const SizedBox(
                                   height: 20,
                                 ),
                                 const Text(
-                                    'A média de lixo produzida por brasileiro é de 7kg por semana'),
+                                  'A média de lixo produzida por brasileiro é de 7kg por semana',
+                                  style: TextStyle(fontSize: 15),
+                                ),
                                 const SizedBox(
                                   height: 20,
                                 ),

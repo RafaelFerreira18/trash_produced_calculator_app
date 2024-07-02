@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/homePage.dart';
 import 'pages/socialPage.dart';
-import 'pages/tips.dart';
 import 'pages/feed.dart';
 
 class UserData {
