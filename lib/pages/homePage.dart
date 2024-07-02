@@ -131,16 +131,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> updateUserPoints(
       String userId, double totalTrashGenerated) async {
     const double averageTrash = 7.0;
-    double points = 0;
+    double points = (averageTrash - totalTrashGenerated) * 10;
 
-    if (averageTrash - totalTrashGenerated <= 0) {
+    // Garante que os pontos não fiquem negativos
+    if (points < 0) {
       points = 0;
-    } else {
-      points = averageTrash - totalTrashGenerated;
     }
 
     DocumentReference userRef =
         FirebaseFirestore.instance.collection('users').doc(userId);
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(userRef);
 
@@ -163,14 +163,20 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
-      // Inicializa os campos se não existirem e atualiza pontos e lastPointUpdate
+      // Atualiza pontos e lastPointUpdate, garantindo que os pontos não fiquem negativos
+      double updatedPoints = currentPoints + points;
+      if (updatedPoints < 0) {
+        updatedPoints = 0;
+      }
+
       transaction.set(
-          userRef,
-          {
-            'points': currentPoints + points,
-            'lastPointUpdate': now,
-          },
-          SetOptions(merge: true));
+        userRef,
+        {
+          'points': updatedPoints,
+          'lastPointUpdate': now,
+        },
+        SetOptions(merge: true),
+      );
     });
   }
 
