@@ -61,6 +61,9 @@ class _SocialPageState extends State<SocialPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pessoas para seguir'), // 
+      ),
       body: FutureBuilder(
           future: _fetchUsers(),
           builder: (context, snapshot) {
@@ -80,14 +83,26 @@ class _SocialPageState extends State<SocialPage> {
                 final user = users[index];
                 final userId = user['id'];
 
-                return ListTile(
-                  title: Text(user['name'] ?? ''),
+              return Card( // Utilização de Card para envolver ListTile
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Ajustei as margens
+                elevation: 3, // Altera a sombra do card
+                child: ListTile(
+                  title: Text(
+                    user['name'] ?? '',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(user['email']),
                   trailing: FutureBuilder<bool>(
                     future: _isFollowing(userId),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        );
                       }
 
                       final isFollowing = snapshot.data ?? false;
@@ -95,9 +110,7 @@ class _SocialPageState extends State<SocialPage> {
                       return IconButton(
                         icon: Icon(
                           isFollowing ? Icons.person_remove : Icons.person_add,
-                          color: isFollowing
-                              ? Colors.red
-                              : const Color.fromARGB(255, 31, 85, 71),
+                          color: isFollowing ? Colors.red : Colors.green,
                         ),
                         onPressed: () {
                           setState(() {
@@ -107,10 +120,12 @@ class _SocialPageState extends State<SocialPage> {
                       );
                     },
                   ),
-                );
-              },
-            );
-          }),
+                ),
+              );
+            },
+          );
+        },
+      ),               
     );
   }
 }
