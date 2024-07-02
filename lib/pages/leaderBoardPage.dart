@@ -42,10 +42,17 @@ class LeaderboardPage extends StatelessWidget {
             itemCount: users.length,
             itemBuilder: (context, index) {
               var user = users[index];
-              return ListTile(
-                title: Text(user['email']),
+              return Container( 
+                decoration: BoxDecoration(
+                  color: Colors.grey[200], //adiciona cor de fundo. [] -> diminui tom da cor
+                  borderRadius: BorderRadius.circular(10), //Adiciona uma borda arredondada
+                ),
+                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                child: ListTile(
+                title: Text(user['email'], style: const TextStyle(fontWeight: FontWeight.bold),),
                 subtitle: Text('Points: ${user['points']}'),
-                leading: CircleAvatar(child: Text('${index + 1}')),
+                leading: CircleAvatar(child: Text('${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold),)),
+                ), //margem interna
               );
             },
           );
